@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-usuario-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ms-usuario-app
+  template:
+    metadata:
+      labels:
+        app: ms-usuario-app
+    spec:
+      containers:
+        - name: my-springboot-app
+          image: acrcodigog3.azurecr.io/PaulNike/ms-usuario-app:#{Build.BuildId}#
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8085
+# service type loadbalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ms-usuario-app
+    k8s-app: ms-usuario-app
+  name: ms-usuario-app
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8085
+  type: LoadBalancer
+  selector:
+    app: ms-usuario-app
